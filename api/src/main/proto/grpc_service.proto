@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+
+option java_multiple_files = true;
+option java_package = "com.karson.api.grpc";
+
+service Request {
+  rpc request (Payload) returns (Payload) {}
+}
+message Payload {
+  map<string, string> extendInfo = 1;
+}
+
+
