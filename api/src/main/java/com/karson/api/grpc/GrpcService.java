@@ -15,15 +15,15 @@ public final class GrpcService {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Payload_descriptor;
+    internal_static_RequestPayload_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_Payload_fieldAccessorTable;
+      internal_static_RequestPayload_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Payload_ExtendInfoEntry_descriptor;
+    internal_static_ReplyPayload_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_Payload_ExtendInfoEntry_fieldAccessorTable;
+      internal_static_ReplyPayload_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -33,29 +33,28 @@ public final class GrpcService {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\022grpc_service.proto\"j\n\007Payload\022,\n\nexten" +
-      "dInfo\030\001 \003(\0132\030.Payload.ExtendInfoEntry\0321\n" +
-      "\017ExtendInfoEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002" +
-      " \001(\t:\0028\0012*\n\007Request\022\037\n\007request\022\010.Payload" +
-      "\032\010.Payload\"\000B\027\n\023com.karson.api.grpcP\001b\006p" +
-      "roto3"
+      "\n\022grpc_service.proto\"!\n\016RequestPayload\022\017" +
+      "\n\007message\030\001 \001(\t\"\037\n\014ReplyPayload\022\017\n\007messa" +
+      "ge\030\001 \001(\t26\n\007Request\022+\n\007request\022\017.Request" +
+      "Payload\032\r.ReplyPayload\"\000B\027\n\023com.karson.a" +
+      "pi.grpcP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_Payload_descriptor =
+    internal_static_RequestPayload_descriptor =
       getDescriptor().getMessageTypes().get(0);
-    internal_static_Payload_fieldAccessorTable = new
+    internal_static_RequestPayload_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_Payload_descriptor,
-        new String[] { "ExtendInfo", });
-    internal_static_Payload_ExtendInfoEntry_descriptor =
-      internal_static_Payload_descriptor.getNestedTypes().get(0);
-    internal_static_Payload_ExtendInfoEntry_fieldAccessorTable = new
+        internal_static_RequestPayload_descriptor,
+        new String[] { "Message", });
+    internal_static_ReplyPayload_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_ReplyPayload_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_Payload_ExtendInfoEntry_descriptor,
-        new String[] { "Key", "Value", });
+        internal_static_ReplyPayload_descriptor,
+        new String[] { "Message", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

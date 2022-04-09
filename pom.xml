@@ -10,6 +10,8 @@
     <version>${revision}</version>
     <modules>
         <module>api</module>
+        <module>server</module>
+        <module>client</module>
     </modules>
 
     <properties>
@@ -44,6 +46,21 @@
     <dependencyManagement>
 
         <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>

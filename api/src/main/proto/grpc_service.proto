@@ -5,10 +5,13 @@ option java_multiple_files = true;
 option java_package = "com.karson.api.grpc";
 
 service Request {
-  rpc request (Payload) returns (Payload) {}
+  rpc request (RequestPayload) returns (ReplyPayload) {}
 }
-message Payload {
-  map<string, string> extendInfo = 1;
+message RequestPayload {
+   string message = 1;
+}
+message ReplyPayload {
+  string message = 1;
 }
 
 
