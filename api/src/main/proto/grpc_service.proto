@@ -6,7 +6,10 @@ option java_package = "com.karson.api.grpc";
 
 service Request {
   rpc request (RequestPayload) returns (ReplyPayload) {}
+  //gRPC服务方法定义 - BiDirection Streaming - 双向流
+  rpc requestBiStream (stream RequestPayload) returns (stream ReplyPayload) {}
 }
+
 message RequestPayload {
    string message = 1;
 }

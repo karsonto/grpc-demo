@@ -46,6 +46,37 @@ public final class RequestGrpc {
     return getRequestMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<RequestPayload,
+      ReplyPayload> getRequestBiStreamMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "requestBiStream",
+      requestType = RequestPayload.class,
+      responseType = ReplyPayload.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
+  public static io.grpc.MethodDescriptor<RequestPayload,
+      ReplyPayload> getRequestBiStreamMethod() {
+    io.grpc.MethodDescriptor<RequestPayload, ReplyPayload> getRequestBiStreamMethod;
+    if ((getRequestBiStreamMethod = RequestGrpc.getRequestBiStreamMethod) == null) {
+      synchronized (RequestGrpc.class) {
+        if ((getRequestBiStreamMethod = RequestGrpc.getRequestBiStreamMethod) == null) {
+          RequestGrpc.getRequestBiStreamMethod = getRequestBiStreamMethod =
+              io.grpc.MethodDescriptor.<RequestPayload, ReplyPayload>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "requestBiStream"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  RequestPayload.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  ReplyPayload.getDefaultInstance()))
+              .setSchemaDescriptor(new RequestMethodDescriptorSupplier("requestBiStream"))
+              .build();
+        }
+      }
+    }
+    return getRequestBiStreamMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -101,6 +132,16 @@ public final class RequestGrpc {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getRequestMethod(), responseObserver);
     }
 
+    /**
+     * <pre>
+     *gRPC服务方法定义 - BiDirection Streaming - 双向流
+     * </pre>
+     */
+    public io.grpc.stub.StreamObserver<RequestPayload> requestBiStream(
+        io.grpc.stub.StreamObserver<ReplyPayload> responseObserver) {
+      return io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall(getRequestBiStreamMethod(), responseObserver);
+    }
+
     @Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -110,6 +151,13 @@ public final class RequestGrpc {
                 RequestPayload,
                 ReplyPayload>(
                   this, METHODID_REQUEST)))
+          .addMethod(
+            getRequestBiStreamMethod(),
+            io.grpc.stub.ServerCalls.asyncBidiStreamingCall(
+              new MethodHandlers<
+                RequestPayload,
+                ReplyPayload>(
+                  this, METHODID_REQUEST_BI_STREAM)))
           .build();
     }
   }
@@ -134,6 +182,17 @@ public final class RequestGrpc {
                         io.grpc.stub.StreamObserver<ReplyPayload> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getRequestMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     * <pre>
+     *gRPC服务方法定义 - BiDirection Streaming - 双向流
+     * </pre>
+     */
+    public io.grpc.stub.StreamObserver<RequestPayload> requestBiStream(
+        io.grpc.stub.StreamObserver<ReplyPayload> responseObserver) {
+      return io.grpc.stub.ClientCalls.asyncBidiStreamingCall(
+          getChannel().newCall(getRequestBiStreamMethod(), getCallOptions()), responseObserver);
     }
   }
 
@@ -183,6 +242,7 @@ public final class RequestGrpc {
   }
 
   private static final int METHODID_REQUEST = 0;
+  private static final int METHODID_REQUEST_BI_STREAM = 1;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -215,6 +275,9 @@ public final class RequestGrpc {
     public io.grpc.stub.StreamObserver<Req> invoke(
         io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
+        case METHODID_REQUEST_BI_STREAM:
+          return (io.grpc.stub.StreamObserver<Req>) serviceImpl.requestBiStream(
+              (io.grpc.stub.StreamObserver<ReplyPayload>) responseObserver);
         default:
           throw new AssertionError();
       }
@@ -267,6 +330,7 @@ public final class RequestGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new RequestFileDescriptorSupplier())
               .addMethod(getRequestMethod())
+              .addMethod(getRequestBiStreamMethod())
               .build();
         }
       }

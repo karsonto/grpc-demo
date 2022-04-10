@@ -35,9 +35,10 @@ public final class GrpcService {
     String[] descriptorData = {
       "\n\022grpc_service.proto\"!\n\016RequestPayload\022\017" +
       "\n\007message\030\001 \001(\t\"\037\n\014ReplyPayload\022\017\n\007messa" +
-      "ge\030\001 \001(\t26\n\007Request\022+\n\007request\022\017.Request" +
-      "Payload\032\r.ReplyPayload\"\000B\027\n\023com.karson.a" +
-      "pi.grpcP\001b\006proto3"
+      "ge\030\001 \001(\t2o\n\007Request\022+\n\007request\022\017.Request" +
+      "Payload\032\r.ReplyPayload\"\000\0227\n\017requestBiStr" +
+      "eam\022\017.RequestPayload\032\r.ReplyPayload\"\000(\0010" +
+      "\001B\027\n\023com.karson.api.grpcP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
