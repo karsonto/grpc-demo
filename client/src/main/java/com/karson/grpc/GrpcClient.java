@@ -29,25 +29,34 @@ public class GrpcClient {
         RequestPayload helloRequest = RequestPayload.newBuilder()
                 .setMessage("Karson")
                 .build();
-        ReplyPayload replyPayload = grpcClient.requestBlocking(helloRequest);
-        System.out.println(replyPayload.getMessage());
-        grpcClient.requestNonBlocking(helloRequest);
-        grpcClient.requestFuture(helloRequest, new FutureCallback<ReplyPayload>() {
-            @Override
-            public void onSuccess(@NullableDecl ReplyPayload replyPayload) {
-                System.out.printf("requestFuture resp: %s", replyPayload.getMessage());
-                System.out.println("");
+        while (true) {
+            try {
+                ReplyPayload replyPayload = grpcClient.requestBlocking(helloRequest);
+                System.out.println(replyPayload.getMessage());
+                Thread.sleep(100);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        }
+        
+//       grpcClient.requestNonBlocking(helloRequest);
+//        grpcClient.requestFuture(helloRequest, new FutureCallback<ReplyPayload>() {
+//            @Override
+//            public void onSuccess(@NullableDecl ReplyPayload replyPayload) {
+//                System.out.printf("requestFuture resp: %s", replyPayload.getMessage());
+//                System.out.println("");
+//            }
+//
+//            @Override
+//            public void onFailure(Throwable throwable) {
+//                System.out.println("requestFuture onFailure");
+//            }
+//        });
+//        List<RequestPayload> listRequestPayload = new ArrayList<>();
+//        listRequestPayload.add(helloRequest);
+//        grpcClient.requestBiStream(listRequestPayload);
     
-            @Override
-            public void onFailure(Throwable throwable) {
-                System.out.println("requestFuture onFailure");
-            }
-        });
-        List<RequestPayload> listRequestPayload = new ArrayList<>();
-        listRequestPayload.add(helloRequest);
-        grpcClient.requestBiStream(listRequestPayload);
-        Thread.sleep(5000);
     }
     
     private void init(String target) {
@@ -59,11 +68,12 @@ public class GrpcClient {
         this.requestFutureStub = RequestGrpc.newFutureStub(managedChannel);
     }
     
-    public ReplyPayload requestBlocking(RequestPayload requestPayload){
+    public ReplyPayload requestBlocking(RequestPayload requestPayload) {
         //阻塞API
-       return this.requestBlockingStub.request(requestPayload);
+        return this.requestBlockingStub.request(requestPayload);
     }
-    public void requestNonBlocking(RequestPayload requestPayload){
+    
+    public void requestNonBlocking(RequestPayload requestPayload) {
         //非阻塞API
         this.requestStub.request(requestPayload, new StreamObserver<ReplyPayload>() {
             @Override
@@ -71,45 +81,45 @@ public class GrpcClient {
                 System.out.printf("resp: %s", replyPayload.getMessage());
                 System.out.println("");
             }
-        
+            
             @Override
             public void onError(Throwable t) {
                 System.err.println("error");
             }
-        
+            
             @Override
             public void onCompleted() {
                 System.out.println("complete");
             }
         });
- 
+        
     }
     
-    public  void requestFuture(RequestPayload requestPayload,final FutureCallback<ReplyPayload> futureCallback){
+    public void requestFuture(RequestPayload requestPayload, final FutureCallback<ReplyPayload> futureCallback) {
         ListenableFuture<ReplyPayload> request = requestFutureStub.request(requestPayload);
-        Futures.addCallback(request,futureCallback,directExecutor());
+        Futures.addCallback(request, futureCallback, directExecutor());
     }
     
-    public void requestBiStream(List<RequestPayload> lequestPayloadList){
-        StreamObserver<RequestPayload> requestObserver = this.requestStub.requestBiStream(new StreamObserver<ReplyPayload>(){
-    
+    public void requestBiStream(List<RequestPayload> lequestPayloadList) {
+        StreamObserver<RequestPayload> requestObserver = this.requestStub.requestBiStream(new StreamObserver<ReplyPayload>() {
+            
             @Override
             public void onNext(ReplyPayload replyPayload) {
                 System.out.printf("BiStream resp: %s", replyPayload.getMessage());
                 System.out.println("");
             }
-    
+            
             @Override
             public void onError(Throwable t) {
                 System.err.println("error");
             }
-    
+            
             @Override
             public void onCompleted() {
                 System.out.println("BiStream complete");
             }
         });
-        lequestPayloadList.forEach(e->{
+        lequestPayloadList.forEach(e -> {
             requestObserver.onNext(e);
         });
         //结束发送请求
