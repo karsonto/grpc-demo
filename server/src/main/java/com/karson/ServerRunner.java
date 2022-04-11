@@ -36,10 +36,18 @@ public class ServerRunner {
             server.shutdown();
         }
     }
+    // block 一直到退出程序
+    private void blockUntilShutdown() throws InterruptedException {
+        if (server != null) {
+            server.awaitTermination();
+        }
+    }
+    
     
     
     public static void main(String[] args) throws IOException, InterruptedException {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        countDownLatch.await();
+        ServerRunner serverRunner = new ServerRunner();
+        serverRunner.serverstart();
+        serverRunner.blockUntilShutdown();
     }
 }
