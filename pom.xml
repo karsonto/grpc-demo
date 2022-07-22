@@ -8,6 +8,7 @@
     <artifactId>grpc-demo</artifactId>
     <packaging>pom</packaging>
     <version>${revision}</version>
+    
     <modules>
         <module>api</module>
         <module>server</module>

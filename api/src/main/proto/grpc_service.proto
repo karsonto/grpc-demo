@@ -11,10 +11,21 @@ service Request {
 }
 
 message RequestPayload {
-   string message = 1;
+   int64 requestId = 1;
+   map<string, RequestObject> payloadMap = 2;
 }
 message ReplyPayload {
-  string message = 1;
+  int64 responseId = 1;
+  int32 code = 2;
+  map<string, ResponseObject> payloadMap = 3;
 }
 
+message RequestObject {
+  int64 oldVersion = 1;
+}
+
+message ResponseObject {
+  int64 currentVersion = 1;
+  string message = 2;
+}
 

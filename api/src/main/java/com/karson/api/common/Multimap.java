@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
@@ -43,6 +44,8 @@ public class Multimap<T, V> implements Closeable {
     private static final ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
 
     private String putIfNull = Integer.toString(threadLocalRandom.nextInt(Integer.MAX_VALUE));
+
+
 
     public static final class Managed {
 
@@ -111,6 +114,35 @@ public class Multimap<T, V> implements Closeable {
         this.CUSLISTCLASS = clazz;
     }
 
+    public Set<T> keySet(){
+        return containerMap.keySet();
+    }
+
+    public void clear(T key){
+        if (null == key) {
+            key = (T) putIfNull;
+        }
+        ReadWriteLock readWriteLock = lockMap.get(key);
+        if (null == readWriteLock) {
+            return;
+        }
+        Lock lock = readWriteLock.writeLock();
+        try{
+            lock.lock();
+            Collection<V> vs = containerMap.get(key);
+            vs.clear();
+        }finally {
+            lock.unlock();
+        }
+    }
+
+    public void clearAndPut(T key ,V value){
+        clear(key);
+        put(key,value);
+
+    }
+
+
     public void remove(T key ,V value){
         if (null == key) {
             key = (T) putIfNull;
@@ -160,6 +192,13 @@ public class Multimap<T, V> implements Closeable {
 
     public boolean containsKey(T key){
         return containerMap.containsKey(key);
+    }
+
+
+    public void putIfAbsent(T key, V value) {
+          if(!containsKey(key)){
+              put(key,value);
+          }
     }
 
     public Optional<Collection<V>> get(T key) {
