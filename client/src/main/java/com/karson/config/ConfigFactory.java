@@ -13,7 +13,7 @@ public class ConfigFactory {
             ConfigService vendorImpl = (ConfigService) constructor.newInstance(properties);
             return vendorImpl;
         } catch (Throwable e) {
-            throw new RuntimeException("Create AthlonConfigService FAIL", e);
+            throw new RuntimeException("Create athlonConfigService Fail", e);
         }
     }
 }
