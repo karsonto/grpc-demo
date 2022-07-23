@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
@@ -24,7 +25,7 @@ public class ConfigManager implements ConfigServerService {
 
     Multimap<String, Long> configVersionContainer = Multimap.createSetMultimap();
 
-    Multimap<Set<String>, AsyncContext> asyncContextContainer = Multimap.createSetMultimap();
+    Multimap<TreeSet<String>, AsyncContext> asyncContextContainer = Multimap.createSetMultimap();
 
     private ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("longPolling-timeout-checker-%d")
             .build();
@@ -38,7 +39,7 @@ public class ConfigManager implements ConfigServerService {
 
     @Override
     public String getConfig(String dataId) throws RuntimeException {
-        Set<String> set = new HashSet<>(Arrays.asList(dataId));
+        Set<String> set = new TreeSet<>(Arrays.asList(dataId));
         return getConfigs(set).get(dataId);
     }
 
@@ -51,10 +52,11 @@ public class ConfigManager implements ConfigServerService {
         RequestPayload request = asyncContext.getRequest();
         Map<String, RequestObject> payloadMapMap = request.getPayloadMapMap();
         Set<String> dataIds = payloadMapMap.keySet();
-        asyncContextContainer.put(dataIds, asyncContext);
+        TreeSet<String> keyTreeSet = new TreeSet<>(dataIds);
+        asyncContextContainer.put(keyTreeSet,asyncContext);
         timeoutChecker.schedule(() -> {
             if (asyncContext.isTimeOut()) {
-                asyncContextContainer.remove(dataIds, asyncContext);
+                asyncContextContainer.remove(keyTreeSet, asyncContext);
                 StreamObserver<ReplyPayload> responseObserver = asyncContext.getResponseObserver();
                 ReplyPayload replyPayload = ReplyPayload.newBuilder().setResponseId(request.getRequestId()).setCode(302)
                         .build();

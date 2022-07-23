@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +35,9 @@ public class Multimap<T, V> implements Closeable {
 
     private Map<T, Collection<V>> containerMap;
 
-    private Map<T, ReadWriteLock> lockMap;
+    private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+   // private Map<T, ReadWriteLock> lockMap;
 
 
     private static final Class<? extends Collection> DEFAULTLISTCLASS = ArrayList.class;
@@ -105,8 +108,8 @@ public class Multimap<T, V> implements Closeable {
     }
 
     public Multimap(int size) {
-        containerMap = new ConcurrentHashMap<>(size);
-        lockMap = new ConcurrentHashMap<>(size);
+        containerMap = new HashMap<>(size);
+        //lockMap = new ConcurrentHashMap<>(size);
     }
 
     public Multimap(Class<? extends Collection> clazz) {
@@ -122,10 +125,10 @@ public class Multimap<T, V> implements Closeable {
         if (null == key) {
             key = (T) putIfNull;
         }
-        ReadWriteLock readWriteLock = lockMap.get(key);
-        if (null == readWriteLock) {
-            return;
-        }
+//        ReadWriteLock readWriteLock = lockMap.get(key);
+//        if (null == readWriteLock) {
+//            return;
+//        }
         Lock lock = readWriteLock.writeLock();
         try{
             lock.lock();
@@ -147,10 +150,10 @@ public class Multimap<T, V> implements Closeable {
         if (null == key) {
             key = (T) putIfNull;
         }
-        ReadWriteLock readWriteLock = lockMap.get(key);
-        if (null == readWriteLock) {
-            return;
-        }
+//        ReadWriteLock readWriteLock = lockMap.get(key);
+//        if (null == readWriteLock) {
+//            return;
+//        }
         Lock lock = readWriteLock.writeLock();
         try {
             lock.lock();
@@ -168,8 +171,8 @@ public class Multimap<T, V> implements Closeable {
         if (null == key) {
             key = (T) putIfNull;
         }
-        ReadWriteLock lock = lockMap.computeIfAbsent(key, (k) -> new ReentrantReadWriteLock());
-        Lock writeLock = lock.writeLock();
+       // ReadWriteLock lock = lockMap.computeIfAbsent(key, (k) -> new ReentrantReadWriteLock());
+        Lock writeLock = readWriteLock.writeLock();
         try {
             writeLock.lock();
             Collection<V> collection = containerMap.computeIfAbsent(key, (k) -> {
@@ -205,10 +208,10 @@ public class Multimap<T, V> implements Closeable {
         if (null == key) {
             key = (T) putIfNull;
         }
-        ReadWriteLock readWriteLock = lockMap.get(key);
-        if (null == readWriteLock) {
-            return Optional.empty();
-        }
+//        ReadWriteLock readWriteLock = lockMap.get(key);
+//        if (null == readWriteLock) {
+//            return Optional.empty();
+//        }
         Lock lock = readWriteLock.readLock();
         try {
             lock.lock();
@@ -236,6 +239,6 @@ public class Multimap<T, V> implements Closeable {
     @Override
     public void close() throws IOException {
         containerMap.clear();
-        lockMap.clear();
+       // lockMap.clear();
     }
 }
