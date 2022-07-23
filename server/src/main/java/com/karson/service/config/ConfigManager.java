@@ -25,7 +25,7 @@ public class ConfigManager implements ConfigServerService {
 
     Multimap<String, Long> configVersionContainer = Multimap.createSetMultimap();
 
-    Multimap<TreeSet<String>, AsyncContext> asyncContextContainer = Multimap.createSetMultimap();
+    Multimap<Set<String>, AsyncContext> asyncContextContainer = Multimap.createSetMultimap();
 
     private ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("longPolling-timeout-checker-%d")
             .build();
@@ -39,7 +39,7 @@ public class ConfigManager implements ConfigServerService {
 
     @Override
     public String getConfig(String dataId) throws RuntimeException {
-        Set<String> set = new TreeSet<>(Arrays.asList(dataId));
+        Set<String> set = new HashSet<>(Arrays.asList(dataId));
         return getConfigs(set).get(dataId);
     }
 
@@ -52,11 +52,10 @@ public class ConfigManager implements ConfigServerService {
         RequestPayload request = asyncContext.getRequest();
         Map<String, RequestObject> payloadMapMap = request.getPayloadMapMap();
         Set<String> dataIds = payloadMapMap.keySet();
-        TreeSet<String> keyTreeSet = new TreeSet<>(dataIds);
-        asyncContextContainer.put(keyTreeSet,asyncContext);
+        asyncContextContainer.put(dataIds,asyncContext);
         timeoutChecker.schedule(() -> {
             if (asyncContext.isTimeOut()) {
-                asyncContextContainer.remove(keyTreeSet, asyncContext);
+                asyncContextContainer.remove(dataIds, asyncContext);
                 StreamObserver<ReplyPayload> responseObserver = asyncContext.getResponseObserver();
                 ReplyPayload replyPayload = ReplyPayload.newBuilder().setResponseId(request.getRequestId()).setCode(302)
                         .build();
