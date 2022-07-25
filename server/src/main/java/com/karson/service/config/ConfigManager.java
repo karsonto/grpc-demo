@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
@@ -57,13 +56,13 @@ public class ConfigManager implements ConfigServerService {
             if (asyncContext.isTimeOut()) {
                 asyncContextContainer.remove(dataIds, asyncContext);
                 StreamObserver<ReplyPayload> responseObserver = asyncContext.getResponseObserver();
-                ReplyPayload replyPayload = ReplyPayload.newBuilder().setResponseId(request.getRequestId()).setCode(302)
+                ReplyPayload replyPayload = ReplyPayload.newBuilder().setResponseId(request.getRequestId()).setCode(304)
                         .build();
                 //输出响应
                 responseObserver.onNext(replyPayload);
                 //结束响应
                 responseObserver.onCompleted();
             }
-        }, 25, TimeUnit.SECONDS);
+        }, 30, TimeUnit.SECONDS);
     }
 }

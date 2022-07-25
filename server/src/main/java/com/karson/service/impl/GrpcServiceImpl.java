@@ -14,6 +14,7 @@ public class GrpcServiceImpl extends RequestGrpc.RequestImplBase {
     @Override
     public void request(RequestPayload request, StreamObserver<ReplyPayload> responseObserver) {
         AsyncContext asyncContext = new AsyncContext(request, responseObserver);
+        System.out.println("request: thread name:"+Thread.currentThread().getName());
         configManager.receive(asyncContext);
         //        System.out.println(request.getMessage());
 //        ReplyPayload replyPayload = ReplyPayload.newBuilder()

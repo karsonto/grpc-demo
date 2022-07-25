@@ -21,11 +21,11 @@ message ReplyPayload {
 }
 
 message RequestObject {
-  int64 oldVersion = 1;
+  string configOldMD5 = 1;
 }
 
 message ResponseObject {
-  int64 currentVersion = 1;
+  string configNewMD5 = 1;
   string message = 2;
 }
 

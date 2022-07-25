@@ -104,9 +104,9 @@ public class GrpcClient {
         
     }
     
-    public void requestFuture(RequestPayload requestPayload, final FutureCallback<ReplyPayload> futureCallback) {
-        ListenableFuture<ReplyPayload> request = requestFutureStub.request(requestPayload);
-        Futures.addCallback(request, futureCallback, directExecutor());
+    public ListenableFuture<ReplyPayload> requestFuture(RequestPayload requestPayload) {
+          return requestFutureStub.request(requestPayload);
+         //Futures.addCallback(request, futureCallback, directExecutor());
     }
     
     public void requestBiStream(List<RequestPayload> lequestPayloadList) {

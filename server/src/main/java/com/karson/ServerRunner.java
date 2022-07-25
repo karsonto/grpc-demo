@@ -1,16 +1,29 @@
 package com.karson;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.karson.service.impl.GrpcServiceImpl;
+import io.grpc.Metadata;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.ServerCall;
+import io.grpc.ServerCallExecutorSupplier;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class ServerRunner {
     Server server;
     Properties properties;
     static int DEFAULT_PORT = 9999;
+
+    private ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("cus thread pool-%d")
+            .build();
 
     public ServerRunner(Properties properties) {
         this.properties = properties;
@@ -25,6 +38,13 @@ public class ServerRunner {
         server = ServerBuilder.forPort(port)
                 //注册服务端实现类
                 .addService(new GrpcServiceImpl())
+//                .callExecutor(new ServerCallExecutorSupplier() {
+//                    @Nullable
+//                    @Override
+//                    public <ReqT, RespT> Executor getExecutor(ServerCall<ReqT, RespT> serverCall, Metadata metadata) {
+//                        return Executors.newSingleThreadExecutor(threadFactory);
+//                    }
+//                })
 //                .intercept(new ServerInterceptor() {
 //                    @Override
 //                    public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> serverCall, Metadata metadata, ServerCallHandler<ReqT, RespT> serverCallHandler) {

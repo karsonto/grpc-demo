@@ -9,7 +9,7 @@ public class AsyncContext {
     private RequestPayload request;
     private StreamObserver<ReplyPayload> responseObserver;
 
-    private boolean isTimeOut = true;
+    private volatile boolean isTimeOut = true;
 
     public boolean isTimeOut() {
         return isTimeOut;
