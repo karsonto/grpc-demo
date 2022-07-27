@@ -92,8 +92,9 @@ public class AthlonConfigService implements ConfigService {
 //                hasListener.await(60L, TimeUnit.SECONDS);
 //            }
             Set<String> keys = listenerMap.keySet();
-            ListenableFuture<ReplyPayload> configByDataIdIfChangeWithAsync = getConfigByDataIdIfChangeWithAsync(keys);
-            ListenableFuture<ReplyPayload> integerListenableFuture = Futures.withTimeout(configByDataIdIfChangeWithAsync, 40L, TimeUnit.SECONDS,
+            Long timeOut = 40L;
+            ListenableFuture<ReplyPayload> configByDataIdIfChangeWithAsync = getConfigByDataIdIfChangeWithAsync(keys,timeOut);
+            ListenableFuture<ReplyPayload> integerListenableFuture = Futures.withTimeout(configByDataIdIfChangeWithAsync, timeOut, TimeUnit.SECONDS,
                     timeoutChecker);
             Futures.addCallback(integerListenableFuture, new FutureCallback<ReplyPayload>() {
                 @Override
@@ -139,7 +140,6 @@ public class AthlonConfigService implements ConfigService {
 
 
     private void executeConfigListenr() {
-        System.out.println("start executeConfigListenr");
         lock.lock();
         try {
             while (listenerMap.keySet().size()<=0) {
@@ -253,18 +253,19 @@ public class AthlonConfigService implements ConfigService {
         return configClient.getConfigByDataIdIfChange(dataId, configDataMD5, 40L);
     }
 
-    private ListenableFuture<ReplyPayload> getConfigByDataIdIfChangeWithAsync(Set<String> dataId) {
+    private ListenableFuture<ReplyPayload> getConfigByDataIdIfChangeWithAsync(Set<String> dataId,Long timeOut) {
         dataId.forEach(e -> {
             configDataMD5.putIfAbsent(e,"");
         });
         ListenableFuture<ReplyPayload> configByDataIdIfChangeWithAsync = configClient.getConfigByDataIdIfChangeWithAsync(
-                dataId, configDataMD5);
+                dataId, configDataMD5,timeOut);
         return configByDataIdIfChangeWithAsync;
     }
 
     @Override
     public String getConfig(String dataId, long timeoutMs) throws RuntimeException {
-        // dataVersion.putIfAbsent(dataId,0L);
+        configDataMD5.putIfAbsent(dataId,"");
+
         return null;
     }
 

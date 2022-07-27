@@ -13,6 +13,7 @@ service Request {
 message RequestPayload {
    int64 requestId = 1;
    map<string, RequestObject> payloadMap = 2;
+   int64 timeout = 3;
 }
 message ReplyPayload {
   int64 responseId = 1;

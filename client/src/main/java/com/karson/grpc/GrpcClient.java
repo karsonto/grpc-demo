@@ -1,7 +1,5 @@
 package com.karson.grpc;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.karson.api.grpc.ReplyPayload;
 import com.karson.api.grpc.RequestGrpc;
@@ -12,8 +10,6 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 public class GrpcClient {
     private RequestGrpc.RequestBlockingStub requestBlockingStub;

@@ -30,24 +30,24 @@ public class Remoteclient {
 
     public ReplyPayload getConfigByDataIdIfChange(Set<String> dataIds, Multimap<String, String> configDataMD5,
             Long timeOut) {
-        RequestPayload payLoadRequest = buildRequestPayload(dataIds, configDataMD5);
+        RequestPayload payLoadRequest = buildRequestPayload(dataIds, configDataMD5,timeOut);
         return grpcClient.requestBlocking(payLoadRequest, timeOut);
     }
 
-    public  ListenableFuture<ReplyPayload> getConfigByDataIdIfChangeWithAsync(Set<String> dataIds, Multimap<String, String> configDataMD5) {
-        RequestPayload payLoadRequest = buildRequestPayload(dataIds, configDataMD5);
+    public  ListenableFuture<ReplyPayload> getConfigByDataIdIfChangeWithAsync(Set<String> dataIds, Multimap<String, String> configDataMD5,Long timeOut) {
+        RequestPayload payLoadRequest = buildRequestPayload(dataIds, configDataMD5,timeOut);
         ListenableFuture<ReplyPayload> replyPayloadListenableFuture = grpcClient.requestFuture(payLoadRequest);
         return replyPayloadListenableFuture;
     }
 
 
-    private RequestPayload buildRequestPayload(Set<String> dataIds, Multimap<String, String> configDataMD5) {
+    private RequestPayload buildRequestPayload(Set<String> dataIds, Multimap<String, String> configDataMD5,Long timeOut) {
         Map<String, RequestObject> requestObjectMap = new HashMap<>();
         dataIds.forEach(e -> {
             String configMd5 = configDataMD5.get(e).get().iterator().next();
             requestObjectMap.put(e, RequestObject.newBuilder().setConfigOldMD5(configMd5).build());
         });
-        RequestPayload payLoadRequest = RequestPayload.newBuilder().setRequestId(REQUEST_ID.getAndIncrement())
+        RequestPayload payLoadRequest = RequestPayload.newBuilder().setRequestId(REQUEST_ID.getAndIncrement()).setTimeout(timeOut)
                 .putAllPayloadMap(requestObjectMap).build();
         return payLoadRequest;
     }

@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -40,7 +42,7 @@ public class Multimap<T, V> implements Closeable {
    // private Map<T, ReadWriteLock> lockMap;
 
 
-    private static final Class<? extends Collection> DEFAULTLISTCLASS = ArrayList.class;
+    private static final Class<? extends Collection> DEFAULTLISTCLASS = CopyOnWriteArrayList.class;
 
     private Class<? extends Collection> CUSLISTCLASS = DEFAULTLISTCLASS;
 
@@ -162,8 +164,7 @@ public class Multimap<T, V> implements Closeable {
         } finally {
             lock.unlock();
         }
-
-
+        
     }
 
 
@@ -185,7 +186,7 @@ public class Multimap<T, V> implements Closeable {
                     } catch (Exception e) {
                         //e.printStackTrace();
                     }
-                  return new ArrayList<>();
+                  return new CopyOnWriteArrayList<>();
             });
             collection.add(value);
         } finally {
@@ -233,7 +234,7 @@ public class Multimap<T, V> implements Closeable {
         return new Multimap<T, V>(listClass);
     }
     public static <T, V> Multimap<T, V> createSetMultimap() {
-        return new Multimap<T, V>(HashSet.class);
+        return new Multimap<T, V>(CopyOnWriteArraySet.class);
     }
 
     @Override

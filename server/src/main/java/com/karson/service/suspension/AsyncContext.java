@@ -4,12 +4,30 @@ import com.karson.api.grpc.ReplyPayload;
 import com.karson.api.grpc.RequestPayload;
 import io.grpc.stub.StreamObserver;
 
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
+
 public class AsyncContext {
 
     private RequestPayload request;
+
     private StreamObserver<ReplyPayload> responseObserver;
 
+    private ReentrantLock lock = new ReentrantLock();
+
     private volatile boolean isTimeOut = true;
+
+
+
+    public void execByLock(Consumer<AsyncContext> consumer){
+        lock.lock();
+        try {
+            consumer.accept(this);
+        }finally {
+            lock.unlock();
+        }
+    }
+
 
     public boolean isTimeOut() {
         return isTimeOut;

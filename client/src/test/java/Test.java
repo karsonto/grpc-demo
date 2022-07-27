@@ -1,5 +1,3 @@
-package com.karson.test;
-
 import com.karson.api.remote.ConfigService;
 import com.karson.config.ConfigFactory;
 
