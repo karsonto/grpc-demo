@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.gson.Gson;
 import com.karson.api.common.Multimap;
 import com.karson.api.grpc.ReplyPayload;
 import com.karson.api.grpc.ResponseObject;
@@ -12,28 +13,32 @@ import com.karson.api.remote.ConfigService;
 import com.karson.remote.Remoteclient;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 public class AthlonConfigService implements ConfigService {
 
     //Work work;
     Multimap<String, Listener> listenerMap = Multimap.createSetMultimap();
 
-    Multimap<String, String> configDataMD5 = Multimap.createSetMultimap();
+    Map<String, String> configDataMD5 = new ConcurrentHashMap<>();
 
     Remoteclient configClient;
 
@@ -109,7 +114,7 @@ public class AthlonConfigService implements ConfigService {
                             Map<String, ResponseObject> payLoadMap = responsePayLoad.getPayloadMapMap();
                             payLoadMap.forEach((key, value) -> {
                                 String currentConfigMd5 = value.getConfigNewMD5();
-                                if (!configDataMD5.get(key).get().iterator().next().equals(currentConfigMd5)) {
+                                if (!configDataMD5.get(key).equals(currentConfigMd5)) {
                                     updateDataMd5(key, currentConfigMd5);
                                     notifyListener(value, listenerMap.get(key));
                                 }
@@ -147,16 +152,17 @@ public class AthlonConfigService implements ConfigService {
             }
             Set<String> keys = listenerMap.keySet();
             ReplyPayload responsePayLoad = getConfigByDataIdIfChange(keys);
+            System.out.println("receive executeConfigListenr response Id : " +  responsePayLoad.getResponseId() +" and code:"+ responsePayLoad.getCode());
             switch (responsePayLoad.getCode()) {
                 case 304:
-                    System.out.println("304");
                     reSetinterval();
                     break;
                 case 200:
                     Map<String, ResponseObject> payLoadMap = responsePayLoad.getPayloadMapMap();
+                  //  System.out.println(new Gson().toJson(payLoadMap));
                     payLoadMap.forEach((key, value) -> {
                         String currentConfigMd5 = value.getConfigNewMD5();
-                        if (!configDataMD5.get(key).get().iterator().next().equals(currentConfigMd5)) {
+                        if (!configDataMD5.get(key).equals(currentConfigMd5)) {
                             updateDataMd5(key, currentConfigMd5);
                             notifyListener(value, listenerMap.get(key));
                         }
@@ -200,7 +206,7 @@ public class AthlonConfigService implements ConfigService {
     }
 
     private void updateDataMd5(String key, String md5) {
-        configDataMD5.clearAndPut(key, md5);
+        configDataMD5.put(key, md5);
     }
 
     //    private void executeConfigListenr() {
@@ -263,10 +269,25 @@ public class AthlonConfigService implements ConfigService {
     }
 
     @Override
-    public String getConfig(String dataId, long timeoutMs) throws RuntimeException {
+    public String getConfig(String dataId) throws RuntimeException {
+        Map<String, String> configDataMD5 = new HashMap<>();
         configDataMD5.putIfAbsent(dataId,"");
-
-        return null;
+        ReplyPayload responsePayLoad = configClient.getConfigByDataIdIfChange(
+                new HashSet<>(Arrays.asList(dataId)), configDataMD5, 0L);
+        AtomicReference<String> config = new AtomicReference<>("");
+        switch (responsePayLoad.getCode()) {
+            case 200:
+                Map<String, ResponseObject> payLoadMap = responsePayLoad.getPayloadMapMap();
+                payLoadMap.forEach((key,value)->{
+                    if(dataId.equals(key)){
+                          config.set(value.getMessage());
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+        return config.get();
     }
 
     @Override
@@ -280,6 +301,11 @@ public class AthlonConfigService implements ConfigService {
             lock.unlock();
         }
 
+    }
+
+    @Override
+    public boolean publishConfig(String dataId, String config) throws RuntimeException {
+              return configClient.publishConfig(dataId, config, 0L);
     }
     //
     //    class Work extends Thread{

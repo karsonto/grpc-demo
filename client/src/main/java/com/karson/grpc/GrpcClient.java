@@ -67,7 +67,7 @@ public class GrpcClient {
     public ReplyPayload requestBlocking(RequestPayload requestPayload,Long timeOut) {
         //阻塞API
         RequestGrpc.RequestBlockingStub requestBlockingStub = RequestGrpc.newBlockingStub(managedChannel)
-                .withDeadlineAfter(timeOut, TimeUnit.SECONDS);
+                .withDeadlineAfter(timeOut + 5L, TimeUnit.SECONDS);
         ReplyPayload request = requestBlockingStub.request(requestPayload);
         return request;
 
